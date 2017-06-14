@@ -1,0 +1,39 @@
+﻿生成启动时间为 2017/4/20 10:32:23。
+     1>项目“C:\Users\yytang\Downloads\flac-1.3.2\src\metaflac\metaflac.vcxproj”在节点 5 上(Rebuild 个目标)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I. /I..\..\include /Zi /nologo /W3 /WX- /O2 /Oi /Ot /Oy /GL /D WIN32 /D NDEBUG /D _CONSOLE /D FLAC__HAS_OGG /D FLAC__NO_DLL /Gm- /EHsc /MT /GS- /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TC /wd4267 /wd4996 /analyze- /errorReport:prompt main.c operations.c operations_shorthand_cuesheet.c operations_shorthand_picture.c operations_shorthand_seektable.c operations_shorthand_streaminfo.c operations_shorthand_vorbiscomment.c options.c usage.c utils.c
+         main.c
+         operations.c
+         operations_shorthand_cuesheet.c
+         operations_shorthand_picture.c
+         operations_shorthand_seektable.c
+         operations_shorthand_streaminfo.c
+         operations_shorthand_vorbiscomment.c
+     1>operations_shorthand_vorbiscomment.c(206): warning C4244: “函数”: 从“const __int64”转换到“size_t”，可能丢失数据
+     1>operations_shorthand_vorbiscomment.c(209): warning C4244: “函数”: 从“const __int64”转换到“size_t”，可能丢失数据
+         options.c
+         usage.c
+         utils.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\bin\metaflac.exe" /INCREMENTAL:NO /NOLOGO "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\libogg_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:uuid.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\bin\metaflac.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\bin\metaflac.lib" /MACHINE:X86 /SAFESEH Release\main.obj
+         Release\operations.obj
+         Release\operations_shorthand_cuesheet.obj
+         Release\operations_shorthand_picture.obj
+         Release\operations_shorthand_seektable.obj
+         Release\operations_shorthand_streaminfo.obj
+         Release\operations_shorthand_vorbiscomment.obj
+         Release\options.obj
+         Release\usage.obj
+         Release\utils.obj
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\libFLAC_static.lib"
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\getopt_static.lib"
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\replaygain_analysis_static.lib"
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\grabbag_static.lib"
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\utf8_static.lib"
+         "C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\win_utf8_io_static.lib"
+     1>LINK : fatal error LNK1181: 无法打开输入文件“C:\Users\yytang\Downloads\flac-1.3.2\objs\Release\lib\libogg_static.lib”
+     1>已完成生成项目“C:\Users\yytang\Downloads\flac-1.3.2\src\metaflac\metaflac.vcxproj”(Rebuild 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:03.39
