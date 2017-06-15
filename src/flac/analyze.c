@@ -71,22 +71,22 @@ void flac__analyze_frame(const FLAC__Frame *frame, unsigned frame_number, FLAC__
 	int max_msb_all = 0;
 	int max_msb_all_all = 0;
 	/* do the human-readable part first */
-	fprintf(fout, "frame=%u\toffset=%" PRIu64 "\tbits=%u\tblocksize=%u\tsample_rate=%u\tchannels=%u\tchannel_assignment=%s\n", frame_number, frame_offset, frame_bytes*8, frame->header.blocksize, frame->header.sample_rate, channels, FLAC__ChannelAssignmentString[frame->header.channel_assignment]);
+	//fprintf(fout, "frame=%u\toffset=%" PRIu64 "\tbits=%u\tblocksize=%u\tsample_rate=%u\tchannels=%u\tchannel_assignment=%s\n", frame_number, frame_offset, frame_bytes*8, frame->header.blocksize, frame->header.sample_rate, channels, FLAC__ChannelAssignmentString[frame->header.channel_assignment]);
 	for(channel = 0; channel < channels; channel++) {
 		//int max_msb_all_all = 0;
 		const FLAC__Subframe *subframe = frame->subframes+channel;
 		const FLAC__bool is_rice2 = subframe->data.fixed.entropy_coding_method.type == FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2;
 		const unsigned pesc = is_rice2? FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_ESCAPE_PARAMETER : FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ESCAPE_PARAMETER;
-		fprintf(fout, "\tsubframe=%u\twasted_bits=%u\ttype=%s", channel, subframe->wasted_bits, FLAC__SubframeTypeString[subframe->type]);
+		//fprintf(fout, "\tsubframe=%u\twasted_bits=%u\ttype=%s", channel, subframe->wasted_bits, FLAC__SubframeTypeString[subframe->type]);
 		switch(subframe->type) {
 			case FLAC__SUBFRAME_TYPE_CONSTANT:
 				fprintf(fout, "\tvalue=%d\n", subframe->data.constant.value);
 				break;
 			case FLAC__SUBFRAME_TYPE_FIXED:
 				FLAC__ASSERT(subframe->data.fixed.entropy_coding_method.type <= FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2);
-				fprintf(fout, "\torder=%u\tresidual_type=%s\tpartition_order=%u\n", subframe->data.fixed.order, is_rice2? "RICE2":"RICE", subframe->data.fixed.entropy_coding_method.data.partitioned_rice.order);
-				for(i = 0; i < subframe->data.fixed.order; i++)
-					fprintf(fout, "\t\twarmup[%u]=%d", i, subframe->data.fixed.warmup[i]);
+				//fprintf(fout, "\torder=%u\tresidual_type=%s\tpartition_order=%u\n", subframe->data.fixed.order, is_rice2? "RICE2":"RICE", subframe->data.fixed.entropy_coding_method.data.partitioned_rice.order);
+				//for(i = 0; i < subframe->data.fixed.order; i++)
+					//fprintf(fout, "\t\twarmup[%u]=%d", i, subframe->data.fixed.warmup[i]);
 				partitions = (1u << subframe->data.fixed.entropy_coding_method.data.partitioned_rice.order);
 				int partition_samples = frame->header.blocksize / partitions;
 				int max_msb = 0;
@@ -96,11 +96,11 @@ void flac__analyze_frame(const FLAC__Frame *frame, unsigned frame_number, FLAC__
 					if (parameter == pesc)
 					{
 						parameter = pesc;
-						fprintf(fout, "\t\tparameter[%u]=ESCAPE, raw_bits=%u", i, subframe->data.fixed.entropy_coding_method.data.partitioned_rice.contents->raw_bits[i]);
+						//fprintf(fout, "\t\tparameter[%u]=ESCAPE, raw_bits=%u", i, subframe->data.fixed.entropy_coding_method.data.partitioned_rice.contents->raw_bits[i]);
 					}
 					else
 					{
-						fprintf(fout, "\tparameter[%u]=%u", i, parameter);
+						//fprintf(fout, "\tparameter[%u]=%u", i, parameter);
 						int begin = 0;
 						int end = 0;
 						if (i == 0)
@@ -108,25 +108,28 @@ void flac__analyze_frame(const FLAC__Frame *frame, unsigned frame_number, FLAC__
 						else
 							begin = partition_samples*i - subframe->data.fixed.order;
 						end = partition_samples*(i + 1) - subframe->data.fixed.order;
-						for (int j = 0; j < 0; j++)
+						for (int j = begin; j < end; j++)
 						{
 							int msb = 0;
-							fprintf(fout, "\t\tresidual[%u]=%d\n", j, subframe->data.lpc.residual[j]);
+							//fprintf(fout, "\t\tresidual[%u]=%d\n", j, subframe->data.lpc.residual[j]);
 							if (subframe->data.fixed.residual[j] < 0)
 								msb = ((-subframe->data.fixed.residual[j] - 1) << 1) + 1;
 							else msb = (subframe->data.fixed.residual[j] << 1);
 							msb = msb >> parameter;
 							if (max_msb < msb)max_msb = msb;
 							//fprintf(fout, "\t\tMSB[%u]=%d\n", j, msb);
-							//fprintf(fout, "%d\n", msb);
+							fprintf(fout, "%d\n", msb);
 						}
 					}
 					//fprintf(fout, "max_MSB=%d\n", max_msb);
 					if (max_msb_all < max_msb)max_msb_all = max_msb;
 				}
 				if(aopts.do_residual_text) {
-					for(i = 0; i < frame->header.blocksize-subframe->data.fixed.order; i++)
-						fprintf(fout, "\t\tresidual[%u]=%d\n", i, subframe->data.fixed.residual[i]);
+					//for (i = 0; i < frame->header.blocksize - subframe->data.fixed.order; i++)
+					//{
+					//	//fprintf(fout, "\t\tresidual[%u]=%d\n", i, subframe->data.fixed.residual[i]);
+					//}
+						
 					//fprintf(fout, "\t\tsum=%d", frame->header.blocksize - subframe->data.lpc.order - 1);
 				}
 				if (max_msb_all > max_msb_all_all)max_msb_all_all = max_msb_all;
