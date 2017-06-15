@@ -3413,7 +3413,8 @@ FLAC__bool process_subframe_(
 		) {
 			/* the above means it's possible all samples are the same value; now double-check it: */
 			unsigned i;
-			signal_is_constant = true;
+			//signal_is_constant = true;
+			signal_is_constant = false;
 			for(i = 1; i < frame_header->blocksize; i++) {
 				if(integer_signal[0] != integer_signal[i]) {
 					signal_is_constant = false;
@@ -3484,98 +3485,100 @@ FLAC__bool process_subframe_(
 			}
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-			/* encode lpc */
-			if(encoder->protected_->max_lpc_order > 0) {
-				if(encoder->protected_->max_lpc_order >= frame_header->blocksize)
-					max_lpc_order = frame_header->blocksize-1;
-				else
-					max_lpc_order = encoder->protected_->max_lpc_order;
-				if(max_lpc_order > 0) {
-					unsigned a;
-					for (a = 0; a < encoder->protected_->num_apodizations; a++) {
-						FLAC__lpc_window_data(integer_signal, encoder->private_->window[a], encoder->private_->windowed_signal, frame_header->blocksize);
-						encoder->private_->local_lpc_compute_autocorrelation(encoder->private_->windowed_signal, frame_header->blocksize, max_lpc_order+1, autoc);
-						/* if autoc[0] == 0.0, the signal is constant and we usually won't get here, but it can happen */
-						if(autoc[0] != 0.0) {
-							FLAC__lpc_compute_lp_coefficients(autoc, &max_lpc_order, encoder->private_->lp_coeff, lpc_error);
-							if(encoder->protected_->do_exhaustive_model_search) {
-								min_lpc_order = 1;
-							}
-							else {
-								const unsigned guess_lpc_order =
-									FLAC__lpc_compute_best_order(
-										lpc_error,
-										max_lpc_order,
-										frame_header->blocksize,
-										subframe_bps + (
-											encoder->protected_->do_qlp_coeff_prec_search?
-												FLAC__MIN_QLP_COEFF_PRECISION : /* have to guess; use the min possible size to avoid accidentally favoring lower orders */
-												encoder->protected_->qlp_coeff_precision
-										)
-									);
-								min_lpc_order = max_lpc_order = guess_lpc_order;
-							}
-							if(max_lpc_order >= frame_header->blocksize)
-								max_lpc_order = frame_header->blocksize - 1;
-							for(lpc_order = min_lpc_order; lpc_order <= max_lpc_order; lpc_order++) {
-								lpc_residual_bits_per_sample = FLAC__lpc_compute_expected_bits_per_residual_sample(lpc_error[lpc_order-1], frame_header->blocksize-lpc_order);
-								if(lpc_residual_bits_per_sample >= (double)subframe_bps)
-									continue; /* don't even try */
-								rice_parameter = (lpc_residual_bits_per_sample > 0.0)? (unsigned)(lpc_residual_bits_per_sample+0.5) : 0; /* 0.5 is for rounding */
-								rice_parameter++; /* to account for the signed->unsigned conversion during rice coding */
-								if(rice_parameter >= rice_parameter_limit) {
-#ifdef DEBUG_VERBOSE
-									fprintf(stderr, "clipping rice_parameter (%u -> %u) @1\n", rice_parameter, rice_parameter_limit - 1);
-#endif
-									rice_parameter = rice_parameter_limit - 1;
-								}
-								if(encoder->protected_->do_qlp_coeff_prec_search) {
-									min_qlp_coeff_precision = FLAC__MIN_QLP_COEFF_PRECISION;
-									/* try to keep qlp coeff precision such that only 32-bit math is required for decode of <=16bps(+1bps for side channel) streams */
-									if(subframe_bps <= 17) {
-										max_qlp_coeff_precision = flac_min(32 - subframe_bps - FLAC__bitmath_ilog2(lpc_order), FLAC__MAX_QLP_COEFF_PRECISION);
-										max_qlp_coeff_precision = flac_max(max_qlp_coeff_precision, min_qlp_coeff_precision);
-									}
-									else
-										max_qlp_coeff_precision = FLAC__MAX_QLP_COEFF_PRECISION;
-								}
-								else {
-									min_qlp_coeff_precision = max_qlp_coeff_precision = encoder->protected_->qlp_coeff_precision;
-								}
-								for(qlp_coeff_precision = min_qlp_coeff_precision; qlp_coeff_precision <= max_qlp_coeff_precision; qlp_coeff_precision++) {
-									_candidate_bits =
-										evaluate_lpc_subframe_(
-											encoder,
-											integer_signal,
-											residual[!_best_subframe],
-											encoder->private_->abs_residual_partition_sums,
-											encoder->private_->raw_bits_per_partition,
-											encoder->private_->lp_coeff[lpc_order-1],
-											frame_header->blocksize,
-											subframe_bps,
-											lpc_order,
-											qlp_coeff_precision,
-											rice_parameter,
-											rice_parameter_limit,
-											min_partition_order,
-											max_partition_order,
-											encoder->protected_->do_escape_coding,
-											encoder->protected_->rice_parameter_search_dist,
-											subframe[!_best_subframe],
-											partitioned_rice_contents[!_best_subframe]
-										);
-									if(_candidate_bits > 0) { /* if == 0, there was a problem quantizing the lpcoeffs */
-										if(_candidate_bits < _best_bits) {
-											_best_subframe = !_best_subframe;
-											_best_bits = _candidate_bits;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+//			/* encode lpc */
+//			
+//			if(encoder->protected_->max_lpc_order > 0) {
+//				if(encoder->protected_->max_lpc_order >= frame_header->blocksize)
+//					max_lpc_order = frame_header->blocksize-1;
+//				else
+//					max_lpc_order = encoder->protected_->max_lpc_order;
+//				if(max_lpc_order > 0) {
+//					unsigned a;
+//					for (a = 0; a < encoder->protected_->num_apodizations; a++) {
+//						FLAC__lpc_window_data(integer_signal, encoder->private_->window[a], encoder->private_->windowed_signal, frame_header->blocksize);
+//						encoder->private_->local_lpc_compute_autocorrelation(encoder->private_->windowed_signal, frame_header->blocksize, max_lpc_order+1, autoc);
+//						/* if autoc[0] == 0.0, the signal is constant and we usually won't get here, but it can happen */
+//						if(autoc[0] != 0.0) {
+//							FLAC__lpc_compute_lp_coefficients(autoc, &max_lpc_order, encoder->private_->lp_coeff, lpc_error);
+//							if(encoder->protected_->do_exhaustive_model_search) {
+//								min_lpc_order = 1;
+//							}
+//							else {
+//								const unsigned guess_lpc_order =
+//									FLAC__lpc_compute_best_order(
+//										lpc_error,
+//										max_lpc_order,
+//										frame_header->blocksize,
+//										subframe_bps + (
+//											encoder->protected_->do_qlp_coeff_prec_search?
+//												FLAC__MIN_QLP_COEFF_PRECISION : /* have to guess; use the min possible size to avoid accidentally favoring lower orders */
+//												encoder->protected_->qlp_coeff_precision
+//										)
+//									);
+//								min_lpc_order = max_lpc_order = guess_lpc_order;
+//							}
+//							if(max_lpc_order >= frame_header->blocksize)
+//								max_lpc_order = frame_header->blocksize - 1;
+//							for(lpc_order = min_lpc_order; lpc_order <= max_lpc_order; lpc_order++) {
+//								lpc_residual_bits_per_sample = FLAC__lpc_compute_expected_bits_per_residual_sample(lpc_error[lpc_order-1], frame_header->blocksize-lpc_order);
+//								if(lpc_residual_bits_per_sample >= (double)subframe_bps)
+//									continue; /* don't even try */
+//								rice_parameter = (lpc_residual_bits_per_sample > 0.0)? (unsigned)(lpc_residual_bits_per_sample+0.5) : 0; /* 0.5 is for rounding */
+//								rice_parameter++; /* to account for the signed->unsigned conversion during rice coding */
+//								if(rice_parameter >= rice_parameter_limit) {
+//#ifdef DEBUG_VERBOSE
+//									fprintf(stderr, "clipping rice_parameter (%u -> %u) @1\n", rice_parameter, rice_parameter_limit - 1);
+//#endif
+//									rice_parameter = rice_parameter_limit - 1;
+//								}
+//								if(encoder->protected_->do_qlp_coeff_prec_search) {
+//									min_qlp_coeff_precision = FLAC__MIN_QLP_COEFF_PRECISION;
+//									/* try to keep qlp coeff precision such that only 32-bit math is required for decode of <=16bps(+1bps for side channel) streams */
+//									if(subframe_bps <= 17) {
+//										max_qlp_coeff_precision = flac_min(32 - subframe_bps - FLAC__bitmath_ilog2(lpc_order), FLAC__MAX_QLP_COEFF_PRECISION);
+//										max_qlp_coeff_precision = flac_max(max_qlp_coeff_precision, min_qlp_coeff_precision);
+//									}
+//									else
+//										max_qlp_coeff_precision = FLAC__MAX_QLP_COEFF_PRECISION;
+//								}
+//								else {
+//									min_qlp_coeff_precision = max_qlp_coeff_precision = encoder->protected_->qlp_coeff_precision;
+//								}
+//								for(qlp_coeff_precision = min_qlp_coeff_precision; qlp_coeff_precision <= max_qlp_coeff_precision; qlp_coeff_precision++) {
+//									_candidate_bits =
+//										evaluate_lpc_subframe_(
+//											encoder,
+//											integer_signal,
+//											residual[!_best_subframe],
+//											encoder->private_->abs_residual_partition_sums,
+//											encoder->private_->raw_bits_per_partition,
+//											encoder->private_->lp_coeff[lpc_order-1],
+//											frame_header->blocksize,
+//											subframe_bps,
+//											lpc_order,
+//											qlp_coeff_precision,
+//											rice_parameter,
+//											rice_parameter_limit,
+//											min_partition_order,
+//											max_partition_order,
+//											encoder->protected_->do_escape_coding,
+//											encoder->protected_->rice_parameter_search_dist,
+//											subframe[!_best_subframe],
+//											partitioned_rice_contents[!_best_subframe]
+//										);
+//									if(_candidate_bits > 0) { /* if == 0, there was a problem quantizing the lpcoeffs */
+//										if(_candidate_bits < _best_bits) {
+//											_best_subframe = !_best_subframe;
+//											_best_bits = _candidate_bits;
+//										}
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//			*/
 #endif /* !defined FLAC__INTEGER_ONLY_LIBRARY */
 		}
 	}
