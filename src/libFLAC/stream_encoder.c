@@ -659,10 +659,15 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 		return FLAC__STREAM_ENCODER_INIT_STATUS_INVALID_SAMPLE_RATE;
 
 	if(encoder->protected_->blocksize == 0) {
+
+		/*
 		if(encoder->protected_->max_lpc_order == 0)
 			encoder->protected_->blocksize = 1152;
 		else
 			encoder->protected_->blocksize = 4096;
+			*/
+		//yytang modify  set blocksize to 64
+		encoder->protected_->blocksize = 64;
 	}
 
 	if(encoder->protected_->blocksize < FLAC__MIN_BLOCK_SIZE || encoder->protected_->blocksize > FLAC__MAX_BLOCK_SIZE)
@@ -3895,8 +3900,8 @@ unsigned find_best_partition_order_(
 	{
 		int partition_order;
 		unsigned sum;
-
-		for(partition_order = (int)max_partition_order, sum = 0; partition_order >= (int)min_partition_order; partition_order--) {
+		//for(partition_order = 0, sum = 0; partition_order <= (int)max_partition_order; partition_order++) 
+		for (partition_order = 0, sum = 0; partition_order <= 0; partition_order++) {
 			if(!
 				set_partitioned_rice_(
 #ifdef EXACT_RICE_BITS_CALCULATION

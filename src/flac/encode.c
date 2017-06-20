@@ -2051,6 +2051,8 @@ FLAC__bool EncoderSession_init_encoder(EncoderSession *e, encode_options_t optio
 				return false;
 			}
 		}
+
+		// for MAX MSB
 		static_metadata_append(&static_metadata, options.vorbis_comment, /*needs_delete=*/false);
 		for(i = 0; i < options.num_pictures; i++)
 			static_metadata_append(&static_metadata, options.pictures[i], /*needs_delete=*/false);
